@@ -7,8 +7,9 @@ import GamifiedSavings from '../components/dashboard/GamifiedSavings';
 import PersonalFinanceAdvisor from '../components/dashboard/PersonalFinanceAdvisor';
 import SmartCart from '../components/dashboard/SmartCart';
 import WarrantyTracker from '../components/dashboard/WarrantyTracker';
-import Modal from '../components/common/Modal'; // Import the Modal component
-import Button from '../components/common/Button'; // Import the Button component - RE-ADDED
+import Modal from '../components/common/Modal';
+import Button from '../components/common/Button';
+import { callGeminiVisionApi } from '../lib/geminiApi'; // Import the Vision API function directly
 
 // Define interfaces for your data structures
 interface SpendingItem {
@@ -40,7 +41,7 @@ interface SmartCartItem {
   frequency: string;
 }
 
-// Interface for extracted receipt data
+// Interface for extracted receipt data (matches LLM output)
 interface ExtractedReceiptData {
   totalAmount?: number;
   date?: string;
@@ -50,8 +51,8 @@ interface ExtractedReceiptData {
 }
 
 const HomePage: React.FC = () => {
-  // Mock data for demonstration purposes (moved here as parent state)
-  const [spendingData, setSpendingData] = useState<SpendingItem[]>([ // Corrected setter name
+  // Mock data for demonstration purposes
+  const [spendingData, setSpendingData] = useState<SpendingItem[]>([
     { category: 'Groceries', amount: 450, color: '#EF4444', percentage: 25 },
     { category: 'Utilities', amount: 180, color: '#3B82F6', percentage: 10 },
     { category: 'Transport', amount: 120, color: '#F59E0B', percentage: 7 },
@@ -61,32 +62,30 @@ const HomePage: React.FC = () => {
     { category: 'Rent', amount: 500, color: '#6B7280', percentage: 25 },
   ]);
 
-  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([ // Corrected setter name
+  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([
     { name: 'New Gadget', target: 1000, current: 650, progress: 65 },
     { name: 'Vacation Fund', target: 2500, current: 800, progress: 32 },
     { name: 'Emergency Fund', target: 5000, current: 3500, progress: 70 },
   ]);
 
-  const [warrantyItems, setWarrantyItems] = useState<WarrantyItem[]>([ // Corrected setter name
+  const [warrantyItems, setWarrantyItems] = useState<WarrantyItem[]>([
     { id: 1, name: 'Smart TV', purchaseDate: '2023-01-15', warrantyEndDate: '2026-01-15', status: 'Active' },
     { id: 2, name: 'Laptop', purchaseDate: '2024-03-10', warrantyEndDate: '2025-03-10', status: 'Active' },
     { id: 3, name: 'Coffee Machine', purchaseDate: '2023-09-01', warrantyEndDate: '2024-09-01', status: 'Expired' },
   ]);
 
-  const [smartCartItems, setSmartCartItems] = useState<SmartCartItem[]>([ // Corrected setter name
+  const [smartCartItems, setSmartCartItems] = useState<SmartCartItem[]>([
     { id: 1, name: 'Organic Milk', lastPurchase: '2 weeks ago', frequency: 'Bi-weekly' },
     { id: 2, name: 'Coffee Beans', lastPurchase: '1 month ago', frequency: 'Monthly' },
     { id: 3, name: 'Laundry Detergent', lastPurchase: '3 weeks ago', frequency: 'Monthly' },
   ]);
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false); // State for sidebar toggle
-  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false); // State for receipt modal
-  // States for receipt upload functionality - RE-ADDED
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState<boolean>(false);
   const [selectedReceiptFile, setSelectedReceiptFile] = useState<File | null>(null);
   const [receiptUploadLoading, setReceiptUploadLoading] = useState<boolean>(false);
   const [receiptUploadMessage, setReceiptUploadMessage] = useState<string>('');
   const [extractedReceiptData, setExtractedReceiptData] = useState<ExtractedReceiptData | null>(null);
-
 
   // Calculate total spending for the overview
   const totalSpending: number = spendingData.reduce((sum, item) => sum + item.amount, 0);
@@ -96,68 +95,96 @@ const HomePage: React.FC = () => {
   // Function to open the receipt upload modal
   const handleReceiptUpload = (): void => {
     setIsReceiptModalOpen(true);
-    setSelectedReceiptFile(null); // Clear previous selection
-    setReceiptUploadMessage(''); // Clear previous messages
-    setExtractedReceiptData(null); // Clear previous extracted data
+    setSelectedReceiptFile(null);
+    setReceiptUploadMessage('');
+    setExtractedReceiptData(null);
   };
 
-  // Handle file selection - RE-ADDED
+  // Handle file selection and read as Base64
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedReceiptFile(event.target.files[0]);
-      setReceiptUploadMessage(`Selected: ${event.target.files[0].name}`);
+      const file = event.target.files[0];
+      setSelectedReceiptFile(file);
+      setReceiptUploadMessage(`Selected: ${file.name}`);
     } else {
       setSelectedReceiptFile(null);
       setReceiptUploadMessage('');
     }
   };
 
-  // Function to upload the selected receipt image and process with LLM - RE-ADDED
-  const uploadReceiptImage = async (): Promise<void> => {
+  // Function to process the selected receipt image with LLM directly from client
+  const processReceiptImage = async (): Promise<void> => {
     if (!selectedReceiptFile) {
       setReceiptUploadMessage('Please select an image file first.');
       return;
     }
 
     setReceiptUploadLoading(true);
-    setReceiptUploadMessage('Uploading and processing receipt...');
+    setReceiptUploadMessage('Reading file and processing receipt...');
 
-    const formData = new FormData();
-    formData.append('receiptImage', selectedReceiptFile);
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedReceiptFile); // Read file as Data URL (Base64)
 
-    try {
-      const response = await fetch('/api/receipts', {
-        method: 'POST',
-        body: formData,
-      });
+    reader.onloadend = async () => {
+      if (typeof reader.result === 'string') {
+        const base64Data = reader.result.split(',')[1]; // Get Base64 part
+        const mimeType = selectedReceiptFile.type;
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const prompt = `
+          Analyze this receipt image and extract the following information in JSON format.
+          If a field is not found, omit it.
+          {
+            "totalAmount": <number, e.g., 25.75>,
+            "date": "<string, e.g., YYYY-MM-DD>",
+            "items": [
+              {"name": "<string>", "price": <number>},
+              {"name": "<string>", "price": <number>}
+            ],
+            "category": "<string, e.g., Groceries, Electronics, Dining>",
+            "warrantyInfo": "<string, any text indicating warranty terms or duration>"
+          }
+        `;
+
+        try {
+          const llmResponseText = await callGeminiVisionApi(prompt, {
+            mimeType: mimeType,
+            data: base64Data,
+          });
+
+          if (llmResponseText) {
+            let extractedData: ExtractedReceiptData = {};
+            try {
+              // Strip markdown code block delimiters before parsing
+              const cleanLlmResponseText = llmResponseText.replace(/```json\n?|\n?```/g, '').trim();
+              extractedData = JSON.parse(cleanLlmResponseText);
+              setExtractedReceiptData(extractedData);
+              setReceiptUploadMessage('Receipt processed successfully!');
+              console.log('Extracted Receipt Data:', extractedData);
+            } catch (parseError) {
+              console.error('Failed to parse LLM response as JSON:', parseError);
+              setReceiptUploadMessage(`AI response was not valid JSON. Raw response: ${llmResponseText}`);
+              setExtractedReceiptData({}); // Indicate no structured data
+            }
+          } else {
+            setReceiptUploadMessage('Failed to get a response from the AI.');
+          }
+        } catch (error) {
+          console.error('Error calling Gemini Vision API:', error);
+          setReceiptUploadMessage(`Failed to process receipt: ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+          setReceiptUploadLoading(false);
+        }
+      } else {
+        setReceiptUploadMessage('Failed to read file as Base64.');
+        setReceiptUploadLoading(false);
       }
+    };
 
-      const result: ExtractedReceiptData = await response.json();
-      setExtractedReceiptData(result);
-      setReceiptUploadMessage('Receipt processed successfully!');
-      console.log('Extracted Receipt Data:', result);
-
-      // Here you would typically update your dashboard state with the extracted data
-      // For example, if you want to add to spendingData:
-      // if (result.totalAmount && result.category) {
-      //   setSpendingData(prev => [...prev, {
-      //     category: result.category,
-      //     amount: result.totalAmount,
-      //     color: '#AAAAAA', // Assign a default color or base on category
-      //     percentage: 0 // Recalculate percentages if integrating fully
-      //   }]);
-      // }
-      // Or update warrantyItems if result.warrantyInfo is present.
-
-    } catch (error) {
-      console.error('Error uploading or processing receipt:', error);
-      setReceiptUploadMessage(`Failed to process receipt: ${error instanceof Error ? error.message : String(error)}`);
-    } finally {
+    reader.onerror = (error) => {
+      console.error('FileReader error:', error);
+      setReceiptUploadMessage('Error reading file.');
       setReceiptUploadLoading(false);
-    }
+    };
   };
 
 
@@ -213,7 +240,7 @@ const HomePage: React.FC = () => {
         {/* Footer (Placeholder for local language support info) */}
         <footer className="mt-8 text-center text-gray-500 text-sm p-4">
           <p>
-            Powered by vibecoderz for smart financial insights. {/* Preserved user's text */}
+            Powered by vibecoderz for smart financial insights.
             <br />
             <span className="font-medium">Local Language Support:</span> Insights and advice in your preferred language.
           </p>
@@ -225,12 +252,12 @@ const HomePage: React.FC = () => {
         isOpen={isReceiptModalOpen}
         onClose={() => setIsReceiptModalOpen(false)}
         title="Upload Receipt for AI Scan"
-        footer={ /* Re-added footer with buttons */
+        footer={
           <div className="flex space-x-2">
             <Button onClick={() => setIsReceiptModalOpen(false)} variant="secondary" disabled={receiptUploadLoading}>
               Close
             </Button>
-            <Button onClick={uploadReceiptImage} disabled={!selectedReceiptFile || receiptUploadLoading}>
+            <Button onClick={processReceiptImage} disabled={!selectedReceiptFile || receiptUploadLoading}>
               {receiptUploadLoading ? 'Processing...' : 'Upload & Scan'}
             </Button>
           </div>
@@ -239,7 +266,7 @@ const HomePage: React.FC = () => {
         <p className="mb-4">
           Upload an image of your receipt. Our AI will extract key details like total amount, items, and date.
         </p>
-        <input /* Re-added file input */
+        <input
           type="file"
           accept="image/*"
           onChange={handleFileChange}
@@ -250,13 +277,13 @@ const HomePage: React.FC = () => {
             file:bg-indigo-50 file:text-indigo-700
             hover:file:bg-indigo-100"
         />
-        {receiptUploadMessage && ( /* Re-added message display */
+        {receiptUploadMessage && (
           <p className={`mt-3 text-sm ${receiptUploadLoading ? 'text-blue-600' : extractedReceiptData ? 'text-green-600' : 'text-red-600'}`}>
             {receiptUploadMessage}
           </p>
         )}
 
-        {extractedReceiptData && ( /* Re-added extracted data display */
+        {extractedReceiptData && (
           <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
             <h5 className="font-semibold text-gray-800 mb-2">Extracted Data:</h5>
             {extractedReceiptData.totalAmount && <p><strong>Total:</strong> ${extractedReceiptData.totalAmount.toFixed(2)}</p>}

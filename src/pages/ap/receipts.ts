@@ -1,3 +1,4 @@
+
 // src/api/receipts.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { callGeminiVisionApi } from '../../lib/geminiApi'; // Import the new vision API function
