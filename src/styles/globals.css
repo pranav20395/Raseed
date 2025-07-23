@@ -1,0 +1,18 @@
+/* src/styles/globals.css */
+
+/*
+   This file is essential for Tailwind CSS.
+   It imports Tailwind's styles and applies global base styles.
+*/
+
+/* Correct way to import Tailwind CSS in v4 */
+@import "tailwindcss";
+
+/* Apply your custom font-family globally */
+/* Since @theme is not used in the CSS file for standard v4 config,
+   we apply the font directly to the body. */
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* You can add any other custom global styles here */
