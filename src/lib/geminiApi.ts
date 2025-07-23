@@ -33,3 +33,50 @@ export async function callGeminiApi(prompt: string): Promise<string | null> {
     return null;
   }
 }
+
+export async function callGeminiVisionApi(
+  prompt: string,
+  imageData: { mimeType: string; data: string }
+): Promise<string | null> {
+  try {
+    const payload = {
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { text: prompt },
+            { inlineData: imageData } // Image data goes here
+          ]
+        }
+      ],
+      // Optional: Add generationConfig if you want structured JSON output directly from LLM
+      // For this example, we're prompting for JSON and parsing it afterwards.
+      // generationConfig: {
+      //     responseMimeType: "application/json",
+      //     responseSchema: { ... }
+      // }
+    };
+
+    const apiKey = "AIzaSyDtc7q4X0zbAWq3QcWBCCY71oF2JCrVdpI"; // Canvas will automatically provide the API key
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (result.candidates && result.candidates.length > 0 &&
+        result.candidates[0].content && result.candidates[0].content.parts &&
+        result.candidates[0].content.parts.length > 0) {
+      return result.candidates[0].content.parts[0].text;
+    } else {
+      console.error('Gemini Vision API response structure unexpected:', result);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error calling Gemini Vision API:', error);
+    return null;
+  }
+}
