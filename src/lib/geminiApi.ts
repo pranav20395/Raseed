@@ -5,8 +5,8 @@
     // This is NOT recommended for production applications.
     // For secure API key handling, you should use server-side API routes (e.g., Next.js API Routes, Firebase Functions).AIzaSyDtc7q4X0zbAWq3QcWBCCY71oF2JCrVdpI
 
-    const NEXT_PUBLIC_GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    // const NEXT_PUBLIC_GEMINI_API_KEY = 'AIzaSyDtc7q4X0zbAWq3QcWBCCY71oF2JCrVdpI';
+    // const NEXT_PUBLIC_GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const NEXT_PUBLIC_GEMINI_API_KEY = 'AIzaSyDtc7q4X0zbAWq3QcWBCCY71oF2JCrVdpI';
 
     /**
      * Calls the Gemini API with a given prompt and returns the generated text.
