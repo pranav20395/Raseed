@@ -46,7 +46,6 @@ const SmartCart: React.FC<SmartCartProps> = ({ smartCartItems }) => {
       <p className="text-gray-600 mb-4">
         Detects repeat purchases and suggests smart shopping lists.
       </p>
-      <p>Use &quot;SmartCart&quot; for best results.</p>
       <ul className="space-y-3">
         {smartCartItems.map((item) => (
           <li key={item.id} className="flex justify-between items-center bg-green-50 p-3 rounded-md shadow-sm">
@@ -63,7 +62,7 @@ const SmartCart: React.FC<SmartCartProps> = ({ smartCartItems }) => {
         className="mt-4 w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={isSurpriseMeLoading}
       >
-        "Surprise Me" (New Picks!) ✨
+        &quot;Surprise Me&quot; (New Picks!) ✨ {/* Escaped quotes */}
       </button>
       {isSurpriseMeLoading && (
         <p className="text-center text-sm text-gray-500 mt-2">Generating suggestions...</p>
