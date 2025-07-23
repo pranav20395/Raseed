@@ -41,7 +41,7 @@ interface SmartCartItem {
 
 const HomePage: React.FC = () => {
   // Mock data for demonstration purposes (moved here as parent state)
-  const [spendingData, setSpendingData] = useState<SpendingItem[]>([
+  const [spendingData, _setSpendingData] = useState<SpendingItem[]>([
     { category: 'Groceries', amount: 450, color: '#EF4444', percentage: 25 },
     { category: 'Utilities', amount: 180, color: '#3B82F6', percentage: 10 },
     { category: 'Transport', amount: 120, color: '#F59E0B', percentage: 7 },
@@ -51,19 +51,19 @@ const HomePage: React.FC = () => {
     { category: 'Rent', amount: 500, color: '#6B7280', percentage: 25 },
   ]);
 
-  const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([
+  const [savingsGoals, _setSavingsGoals] = useState<SavingsGoal[]>([
     { name: 'New Gadget', target: 1000, current: 650, progress: 65 },
     { name: 'Vacation Fund', target: 2500, current: 800, progress: 32 },
     { name: 'Emergency Fund', target: 5000, current: 3500, progress: 70 },
   ]);
 
-  const [warrantyItems, setWarrantyItems] = useState<WarrantyItem[]>([
+  const [warrantyItems, _setWarrantyItems] = useState<WarrantyItem[]>([
     { id: 1, name: 'Smart TV', purchaseDate: '2023-01-15', warrantyEndDate: '2026-01-15', status: 'Active' },
     { id: 2, name: 'Laptop', purchaseDate: '2024-03-10', warrantyEndDate: '2025-03-10', status: 'Active' },
     { id: 3, name: 'Coffee Machine', purchaseDate: '2023-09-01', warrantyEndDate: '2024-09-01', status: 'Expired' },
   ]);
 
-  const [smartCartItems, setSmartCartItems] = useState<SmartCartItem[]>([
+  const [smartCartItems, _setSmartCartItems] = useState<SmartCartItem[]>([
     { id: 1, name: 'Organic Milk', lastPurchase: '2 weeks ago', frequency: 'Bi-weekly' },
     { id: 2, name: 'Coffee Beans', lastPurchase: '1 month ago', frequency: 'Monthly' },
     { id: 3, name: 'Laundry Detergent', lastPurchase: '3 weeks ago', frequency: 'Monthly' },
@@ -134,7 +134,7 @@ const HomePage: React.FC = () => {
         {/* Footer (Placeholder for local language support info) */}
         <footer className="mt-8 text-center text-gray-500 text-sm p-4">
           <p>
-            Powered by AI for smart financial insights.
+            Powered by vibecoderz for smart financial insights.
             <br />
             <span className="font-medium">Local Language Support:</span> Insights and advice in your preferred language.
           </p>
@@ -152,9 +152,7 @@ const HomePage: React.FC = () => {
           Our AI (powered by Gemini) would then extract key information like items, prices,
           and dates, categorize your spending, and even identify warranty details!
         </p>
-        <p className="mt-4 text-sm text-gray-500">
-          (Full implementation would involve file input and backend API calls for image processing.)
-        </p>
+
       </Modal>
     </div>
   );

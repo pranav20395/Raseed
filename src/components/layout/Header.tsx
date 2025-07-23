@@ -1,5 +1,6 @@
 // src/components/layout/Header.tsx
 import React from 'react';
+import Image from 'next/image';
 
 interface HeaderProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -28,15 +29,12 @@ const Header: React.FC<HeaderProps> = ({ setIsSidebarOpen }) => {
       </div>
       <div className="flex items-center space-x-2">
         <span className="text-sm sm:text-base hidden sm:block">Welcome, User!</span>
-        <img
+        <Image
           src="https://placehold.co/40x40/E0E7FF/4338CA?text=U"
           alt="User Avatar"
+          width={40}
+          height={40}
           className="w-10 h-10 rounded-full border-2 border-indigo-400"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.onerror = null;
-            target.src = "https://placehold.co/40x40/E0E7FF/4338CA?text=U";
-          }}
         />
       </div>
     </header>

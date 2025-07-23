@@ -7,7 +7,7 @@
  */
 export async function callGeminiApi(prompt: string): Promise<string | null> {
   try {
-    let chatHistory = [];
+    const chatHistory = [];
     chatHistory.push({ role: "user", parts: [{ text: prompt }] });
     const payload = { contents: chatHistory };
     const apiKey = ""; // Canvas will automatically provide the API key
