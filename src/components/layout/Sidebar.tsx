@@ -14,7 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen, setIsSidebarOpen }) =>
       }  transition-transform duration-300 ease-in-out z-30`}
     >
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold">FinTrack AI</h2>
+        <h2 className="text-2xl font-bold">Raseed AI</h2>
         <button
           onClick={() => setIsSidebarOpen(false)}
           className="text-white focus:outline-none"
