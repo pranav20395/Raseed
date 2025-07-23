@@ -134,7 +134,7 @@ const HomePage: React.FC = () => {
         {/* Footer (Placeholder for local language support info) */}
         <footer className="mt-8 text-center text-gray-500 text-sm p-4">
           <p>
-            Powered by AI for smart financial insights.
+            Powered by vibecoderz for smart financial insights.
             <br />
             <span className="font-medium">Local Language Support:</span> Insights and advice in your preferred language.
           </p>
@@ -152,9 +152,7 @@ const HomePage: React.FC = () => {
           Our AI (powered by Gemini) would then extract key information like items, prices,
           and dates, categorize your spending, and even identify warranty details!
         </p>
-        <p className="mt-4 text-sm text-gray-500">
-          (Full implementation would involve file input and backend API calls for image processing.)
-        </p>
+
       </Modal>
     </div>
   );

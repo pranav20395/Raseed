@@ -46,6 +46,7 @@ const SmartCart: React.FC<SmartCartProps> = ({ smartCartItems }) => {
       <p className="text-gray-600 mb-4">
         Detects repeat purchases and suggests smart shopping lists.
       </p>
+      <p>Use &quot;SmartCart&quot; for best results.</p>
       <ul className="space-y-3">
         {smartCartItems.map((item) => (
           <li key={item.id} className="flex justify-between items-center bg-green-50 p-3 rounded-md shadow-sm">
