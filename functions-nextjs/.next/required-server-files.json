@@ -103,7 +103,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/Users/pranavsharma/Projects/wallet/raseed/functions-nextjs",
+    "outputFileTracingRoot": "/Users/pranavsharma/Projects/wallet/raseed",
     "experimental": {
       "useSkewCookie": false,
       "nodeMiddleware": false,
@@ -294,11 +294,11 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
     "turbopack": {
-      "root": "/Users/pranavsharma/Projects/wallet/raseed/functions-nextjs"
+      "root": "/Users/pranavsharma/Projects/wallet/raseed"
     }
   },
   "appDir": "/Users/pranavsharma/Projects/wallet/raseed/functions-nextjs",
-  "relativeAppDir": "",
+  "relativeAppDir": "functions-nextjs",
   "files": [
     ".next/routes-manifest.json",
     ".next/server/pages-manifest.json",

@@ -9,7 +9,7 @@ import SmartCart from '../components/dashboard/SmartCart';
 import WarrantyTracker from '../components/dashboard/WarrantyTracker';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
-import { callGeminiVisionApi } from '../lib/geminiApi'; // Import the Vision API function directly
+// import { callGeminiVisionApi } from '../lib/geminiApi'; // Import the Vision API function directly
 
 // Define interfaces for your data structures
 interface SpendingItem {
@@ -127,58 +127,36 @@ const HomePage: React.FC = () => {
 
     reader.onloadend = async () => {
       if (typeof reader.result === 'string') {
-        const base64Data = reader.result.split(',')[1]; // Get Base64 part
-        const mimeType = selectedReceiptFile.type;
-
-        const prompt = `
-          Analyze this receipt image and extract the following information in JSON format.
-          If a field is not found, omit it.
-          {
-            "totalAmount": <number, e.g., 25.75>,
-            "date": "<string, e.g., YYYY-MM-DD>",
-            "items": [
-              {"name": "<string>", "price": <number>},
-              {"name": "<string>", "price": <number>}
-            ],
-            "category": "<string, e.g., Groceries, Electronics, Dining>",
-            "warrantyInfo": "<string, any text indicating warranty terms or duration>"
-          }
-        `;
-
+        const prompt = `...`;
+    
         try {
-          const llmResponseText = await callGeminiVisionApi(prompt, {
-            mimeType: mimeType,
-            data: base64Data,
+          const res = await fetch('/api/parse', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt,
+              gcs_uri: 'gs://smart-wallet-default/receipt.jpeg', // hardcoded for now
+            }),
           });
-
-          if (llmResponseText) {
-            let extractedData: ExtractedReceiptData = {};
-            try {
-              // Strip markdown code block delimiters before parsing
-              const cleanLlmResponseText = llmResponseText.replace(/```json\n?|\n?```/g, '').trim();
-              extractedData = JSON.parse(cleanLlmResponseText);
-              setExtractedReceiptData(extractedData);
-              setReceiptUploadMessage('Receipt processed successfully!');
-              console.log('Extracted Receipt Data:', extractedData);
-            } catch (parseError) {
-              console.error('Failed to parse LLM response as JSON:', parseError);
-              setReceiptUploadMessage(`AI response was not valid JSON. Raw response: ${llmResponseText}`);
-              setExtractedReceiptData({}); // Indicate no structured data
-            }
+    
+          const result = await res.json();
+    
+          if (res.ok) {
+            setExtractedReceiptData(result);
+            setReceiptUploadMessage('Receipt processed successfully via Cloud Run!');
           } else {
-            setReceiptUploadMessage('Failed to get a response from the AI.');
+            console.error('Cloud Run Error:', result);
+            setReceiptUploadMessage(`Cloud Run Error: ${result.error}`);
           }
         } catch (error) {
-          console.error('Error calling Gemini Vision API:', error);
-          setReceiptUploadMessage(`Failed to process receipt: ${error instanceof Error ? error.message : String(error)}`);
+          console.error('API call failed:', error);
+          setReceiptUploadMessage(`Failed to call API: ${error instanceof Error ? error.message : String(error)}`);
         } finally {
           setReceiptUploadLoading(false);
         }
-      } else {
-        setReceiptUploadMessage('Failed to read file as Base64.');
-        setReceiptUploadLoading(false);
       }
     };
+    
 
     reader.onerror = (error) => {
       console.error('FileReader error:', error);

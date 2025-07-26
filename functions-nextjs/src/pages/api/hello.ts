@@ -10,5 +10,5 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  res.status(200).json({ message: 'Hello from Next.js API!' });
+  res.status(200).json({ message: 'Hello from Next.js api folder' });
 }
