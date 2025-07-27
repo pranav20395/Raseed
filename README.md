@@ -1,36 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+<img width="643" height="275" alt="Screenshot 2025-07-27 at 11 54 58 AM" src="https://github.com/user-attachments/assets/61909260-d6ab-416c-930f-f628ad583d4a" />
 
 ## Getting Started
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Let's be honest, managing physical receipts is a total pain for all of us, especially if you're like many users who aren't really paying much attention to where their money goes. Your hard-earned cash just seems to vanish into thin air! You end up with crumpled receipts stuffed in pockets, leading to lost records and zero clue what you've actually spent .
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+hosted on (https://smart-wallet-b9b00.web.app) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can start editing the page by modifying `src/page/index.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tailwind CSS
+<img width="828" height="331" alt="Screenshot 2025-07-27 at 11 57 19 AM" src="https://github.com/user-attachments/assets/84e9b4d2-dd38-4d0f-9e1e-2f97d474388d" />
 
-## Learn More
+Implemented Google wallet with the dashboard to manage expanses with latest form.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy on Firebase
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+NextJS deployed on firebase with help of Functions to make the SSR(server side rendering) dynamic Site, with dashboard to catter your payments needs.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
