@@ -133,7 +133,7 @@ export default function Login() {
           </div>
           
           <div className="text-center mt-6 text-gray-600 text-sm">
-            Don't Have An Account? <a href="#" className="text-indigo-600 font-bold hover:underline">Register Now.</a>
+            Don&apos;t Have An Account? <a href="#" className="text-indigo-600 font-bold hover:underline">Register Now.</a>
           </div>
         </div>
 

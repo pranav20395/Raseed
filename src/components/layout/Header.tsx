@@ -1,12 +1,12 @@
 import { signOut, useSession } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";  // Import Image from next/image
 
 const Header = ({ setIsSidebarOpen }: { setIsSidebarOpen: (open: boolean) => void }) => {
   const { data: session } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -40,10 +40,12 @@ const Header = ({ setIsSidebarOpen }: { setIsSidebarOpen: (open: boolean) => voi
             onClick={() => setDropdownOpen((open) => !open)}
           >
             {session.user?.image ? (
-              <img
+              <Image
                 src={session.user.image}
                 alt="User Avatar"
-                className="w-9 h-9 rounded-full border-2 border-indigo-200 object-cover"
+                width={36} // 9 * 4 (Tailwind's w-9/h-9 = 36px)
+                height={36}
+                className="rounded-full border-2 border-indigo-200 object-cover"
               />
             ) : (
               <div className="w-9 h-9 rounded-full bg-indigo-400 flex items-center justify-center text-lg font-bold text-white">

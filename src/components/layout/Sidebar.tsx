@@ -1,8 +1,8 @@
-// src/components/layout/Sidebar.tsx
 import React from 'react';
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";  // Import Image here
 
 const navLinks = [
   { name: "Dashboard", href: "/", icon: "🏠" },
@@ -30,10 +30,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isSidebarOpen, setIsSidebarOpen }) =>
         <div>
           <div className="flex items-center space-x-3 px-6 py-5 border-b border-indigo-700">
             {session?.user?.image ? (
-              <img
+              <Image
                 src={session.user.image}
                 alt="User Avatar"
-                className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                width={40}  // 10 * 4 = 40px (Tailwind w-10/h-10)
+                height={40}
+                className="rounded-full border-2 border-white object-cover"
               />
             ) : (
               <div className="w-10 h-10 rounded-full bg-indigo-400 flex items-center justify-center text-xl font-bold">

@@ -1,15 +1,16 @@
 // src/components/dashboard/GamifiedSavings.tsx
 import React from 'react';
-
+import Image from 'next/image';
 
 export const GoogleWalletButton = ({ href }: { href: string | null }) => {
   if (!href) return null;
   return (
     <a href={href} target="_blank" rel="noopener noreferrer">
-      <img
+      <Image
         src="/wallet-button.png"
         alt="Add to Google Wallet"
-        width="200"
+        width={200}
+        height={60} // adjust height as per your image aspect ratio
       />
     </a>
   );
@@ -67,17 +68,17 @@ const GamifiedSavings: React.FC<GamifiedSavingsProps> = ({ savingsGoals, handleR
           </span>
         </div>
       </div>
-       {/* Conceptual Receipt Upload Button */}
-       <div className="mt-6">
-          <button
-              onClick={handleReceiptUpload}
-              className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-          >
-              Upload Receipt ✨ (AI Scan)
-          </button>
-          <p className="text-xs text-gray-500 mt-2 text-center">
-              *This feature would use Gemini for turning paper receipts into smart data!
-          </p>
+      {/* Conceptual Receipt Upload Button */}
+      <div className="mt-6">
+        <button
+          onClick={handleReceiptUpload}
+          className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+        >
+          Upload Receipt ✨ (AI Scan)
+        </button>
+        <p className="text-xs text-gray-500 mt-2 text-center">
+          *This feature would use Gemini for turning paper receipts into smart data!
+        </p>
       </div>
     </div>
   );

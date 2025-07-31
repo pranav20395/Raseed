@@ -2,7 +2,6 @@
 
 import { useSession } from "next-auth/react";
 import { getSession } from 'next-auth/react';
-import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -58,38 +57,28 @@ interface ExtractedReceiptItem {
   user_id?: string | null;
 }
 
+interface Session {
+  user: {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+  expires: string;
+}
+
 interface HomePageProps {
-  session: any;
+  session: Session;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
   const { data: clientSession, status } = useSession();
   const router = useRouter();
 
-  // Use client session if available, else fallback to server session
-  const session = clientSession ?? serverSession;
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/login"); // <-- Use your custom login page
-    }
-  }, [status, router]);
-
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-100 via-white to-indigo-200">
-        <span className="text-lg text-indigo-600 font-semibold animate-pulse">Loading...</span>
-      </div>
-    );
-  }
-  if (!session) {
-    return null;
-  }
-
-  const [spendingData] = useState<SpendingItem[]>([ /* initial data */ ]);
-  const [savingsGoals] = useState<SavingsGoal[]>([ /* initial data */ ]);
-  const [warrantyItems] = useState<WarrantyItem[]>([ /* initial data */ ]);
-  const [smartCartItems] = useState<SmartCartItem[]>([ /* initial data */ ]);
+  const [spendingData] = useState<SpendingItem[]>([]);
+  const [savingsGoals] = useState<SavingsGoal[]>([]);
+  const [warrantyItems] = useState<WarrantyItem[]>([]);
+  const [smartCartItems] = useState<SmartCartItem[]>([]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
@@ -100,6 +89,23 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
   const [walletCreationLoading, setWalletCreationLoading] = useState(false);
   const [walletUrl, setWalletUrl] = useState<string | null>(null);
   const [walletCreationMessage, setWalletCreationMessage] = useState('');
+
+  const session = clientSession ?? serverSession;
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-100 via-white to-indigo-200">
+        <span className="text-lg text-indigo-600 font-semibold animate-pulse">Loading...</span>
+      </div>
+    );
+  }
+  if (!session) return null;
 
   const totalSpending = spendingData.reduce((sum, item) => sum + item.amount, 0);
   const totalSavings = savingsGoals.reduce((sum, goal) => sum + goal.current, 0);
@@ -141,7 +147,7 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
             body: JSON.stringify({ base64: reader.result, filename: `receipt_${Date.now()}.jpeg` }),
           });
 
-          const uploadResult = await uploadRes.json();
+          const uploadResult: { gcsUri: string; error?: string } = await uploadRes.json();
           if (!uploadRes.ok) throw new Error(uploadResult.error || 'Upload failed');
 
           const userId = session?.user?.id || 'anonymous';
@@ -157,15 +163,15 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
             }),
           });
 
-          const result = await res.json();
+          const result: { text: ExtractedReceiptItem[]; error?: string } = await res.json();
           if (res.ok) {
             setExtractedReceiptData(result.text);
             setReceiptUploadMessage('Receipt processed successfully!');
           } else {
             setReceiptUploadMessage(`Cloud Run Error: ${result.error}`);
           }
-        } catch (error: any) {
-          setReceiptUploadMessage(error.message || 'Unexpected error');
+        } catch (error: unknown) {
+          setReceiptUploadMessage((error as Error).message || 'Unexpected error');
         } finally {
           setReceiptUploadLoading(false);
         }
@@ -195,12 +201,12 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
         body: JSON.stringify({ receiptData: extractedReceiptData }),
       });
 
-      const result = await response.json();
+      const result: { walletUrl: string; error?: string } = await response.json();
       if (!response.ok) throw new Error(result.error || 'Failed to create wallet pass.');
 
       setWalletUrl(result.walletUrl);
       setWalletCreationMessage('Pass created successfully!');
-    } catch (error) {
+    } catch (error: unknown) {
       setWalletCreationMessage(`Error: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setWalletCreationLoading(false);
@@ -213,11 +219,8 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-40 z-20 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
-
-      {/* Make main content scrollable */}
       <div className={`flex-1 flex flex-col h-screen overflow-auto transition-all duration-300 ease-in-out ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-0'} z-10`}>
         <Header setIsSidebarOpen={setIsSidebarOpen} />
-
         <main className="p-4 sm:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
           <section className="lg:col-span-2 space-y-8">
             <div className="bg-white/80 rounded-2xl shadow-lg p-6 border border-indigo-100">
@@ -227,7 +230,6 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
               <GamifiedSavings savingsGoals={savingsGoals} handleReceiptUpload={handleReceiptUpload} />
             </div>
           </section>
-
           <section className="lg:col-span-1 space-y-8">
             <div className="bg-white/80 rounded-2xl shadow-lg p-6 border border-indigo-100">
               <PersonalFinanceAdvisor spendingData={spendingData} savingsGoals={savingsGoals} />
@@ -240,7 +242,6 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
             </div>
           </section>
         </main>
-
         <footer className="mt-8 text-center text-gray-500 text-sm p-4">
           <p>
             Powered by <span className="font-semibold text-indigo-600">vibecoderz</span> for smart financial insights.
@@ -277,7 +278,6 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
             {receiptUploadMessage}
           </p>
         )}
-
         {extractedReceiptData && extractedReceiptData.length > 0 && (
           <>
             <div className="mt-4 p-3 bg-indigo-50 rounded-md border border-indigo-200 max-h-[300px] overflow-y-auto">
