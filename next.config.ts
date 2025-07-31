@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     unoptimized: true,
   },
+  experimental: {
+    optimizeCss: false, // Disable LightningCSS optimization to avoid build errors
+  },
 };
 
 export default nextConfig;
