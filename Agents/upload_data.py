@@ -6,7 +6,7 @@ from vertexai.generative_models import GenerativeModel, Part
 import json
 import re
 from google.cloud import bigquery
-from clean_model import clean_json
+from Agents.clean_model import clean_json
 
 PROJECT_ID = "smart-wallet-b9b00"
 LOCATION = "us-west1"
