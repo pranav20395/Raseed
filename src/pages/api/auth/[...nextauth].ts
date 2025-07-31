@@ -13,4 +13,10 @@ export default NextAuth({
       },
     }),
   ],
+
+  // Just remove session.strategy if you want default DB sessions (or keep jwt for stateless)
+  // Remove jwt and session callbacks unless you need accessToken on client
+
+  // Optional: Add database config if you want persistent sessions
+
 });

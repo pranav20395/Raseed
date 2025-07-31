@@ -1,11 +1,11 @@
 // types/next-auth.d.ts
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import NextAuth from "next-auth";
 
 declare module "next-auth" {
   interface Session {
+    accessToken?: string;  // <-- add this line
     user: {
-      id: string; // ✅ add this
+      id: string;          // <-- your existing addition
       name?: string | null;
       email?: string | null;
       image?: string | null;
