@@ -6,3 +6,7 @@ env_variables:
   NEXTAUTH_URL: "https://raseed-backend-kmm2mlvmya-uc.a.run.app"
   GOOGLE_CLIENT_ID: "57041492042-rc19uud5npftq070tnjbirqjr783ejfd.apps.googleusercontent.com"
   GOOGLE_CLIENT_SECRET: "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"
+
+instance_class: F1
+automatic_scaling:
+  max_instances: 5  # Or any number based on your expected load

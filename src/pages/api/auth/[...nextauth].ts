@@ -13,7 +13,7 @@ export default NextAuth({
       },
     }),
   ],
-  secret: "74b7a3f957cff83bdc2a072ddc883056e331b79919c8c0d795392a0310125737", // ✅ required for production deployments
+  secret: process.env.NEXTAUTH_SECRET, // ✅ required for production deployments
 
   // Optional: session config
   session: {
