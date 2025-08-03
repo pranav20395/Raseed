@@ -8,16 +8,62 @@ runConfig:
   # memoryMiB: 512
 
 # Environment variables and secrets.
-# env:
+env:
   # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
+  # These will be available during both BUILD and RUNTIME
+  # The 'availability' key is optional, if not specified, it defaults to both.
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyCnNP2WR0GAnfOuraQonyfz4pxoGKViobQ" # <--- REPLACE WITH YOUR ACTUAL API KEY
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "smart-wallet-b9b00.firebaseapp.com"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "smart-wallet-b9b00"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "smart-wallet-b9b00.appspot.com"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "57041492042"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:57041492042:web:3bbb6318b7ca02bde62eb3"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  # If you have Google Analytics configured, include its measurement ID as well:
+  # - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  #   value: "G-XXXXXXXXXX" # <--- REPLACE WITH YOUR ACTUAL MEASUREMENT ID
   #   availability:
   #     - BUILD
   #     - RUNTIME
 
+  # You can also add other environment variables your app needs, for example:
+  # - variable: MY_CUSTOM_MESSAGE
+  #   value: "Welcome to my Firebase app!"
+  #   availability:
+  #     - RUNTIME # Maybe this one is only needed when the app is running, not during build.
+
   # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  # This section is for truly sensitive information (e.g., third-party API keys that *must* be kept secret)
+  # and requires setting up secrets in Cloud Secret Manager. Your Firebase API key
+  # is generally not considered a "secret" in this context as it's publicly exposed by client-side code anyway.
+  # - variable: MY_TRULY_SENSITIVE_SECRET
+  #   secret: myTrulySensitiveSecretName # This is the name of your secret in Secret Manager
