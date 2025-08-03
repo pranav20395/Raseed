@@ -1,9 +1,11 @@
-import { signOut, useSession } from "next-auth/react";
-import { useState, useRef, useEffect } from "react";
-import Image from "next/image";  // Import Image from next/image
+// Header.tsx
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../../lib/firebase';
+import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 
 const Header = ({ setIsSidebarOpen }: { setIsSidebarOpen: (open: boolean) => void }) => {
-  const { data: session } = useSession();
+  const [user] = useAuthState(auth);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -14,12 +16,16 @@ const Header = ({ setIsSidebarOpen }: { setIsSidebarOpen: (open: boolean) => voi
       }
     }
     if (dropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownOpen]);
+
+  const handleSignOut = async () => {
+    await auth.signOut();
+  };
 
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-white shadow relative z-40">
@@ -33,35 +39,35 @@ const Header = ({ setIsSidebarOpen }: { setIsSidebarOpen: (open: boolean) => voi
       <div className="flex-1 text-center font-extrabold text-xl tracking-tight text-indigo-700 select-none">
         Raseed
       </div>
-      {session && (
+      {user && (
         <div className="relative ml-4" ref={dropdownRef}>
           <button
             className="flex items-center space-x-2 focus:outline-none"
             onClick={() => setDropdownOpen((open) => !open)}
           >
-            {session.user?.image ? (
+            {user.photoURL ? (
               <Image
-                src={session.user.image}
+                src={user.photoURL}
                 alt="User Avatar"
-                width={36} // 9 * 4 (Tailwind's w-9/h-9 = 36px)
+                width={36}
                 height={36}
                 className="rounded-full border-2 border-indigo-200 object-cover"
               />
             ) : (
               <div className="w-9 h-9 rounded-full bg-indigo-400 flex items-center justify-center text-lg font-bold text-white">
-                {session.user?.name?.[0] || "U"}
+                {user.displayName?.[0] || 'U'}
               </div>
             )}
-            <span className="hidden sm:block font-medium text-gray-700">{session.user?.name}</span>
+            <span className="hidden sm:block font-medium text-gray-700">{user.displayName}</span>
             <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded shadow-lg py-2 z-50">
-              <div className="px-4 py-2 text-xs text-gray-500 border-b">{session.user?.email}</div>
+              <div className="px-4 py-2 text-xs text-gray-500 border-b">{user.email}</div>
               <button
-                onClick={() => signOut()}
+                onClick={handleSignOut}
                 className="w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-50 transition"
               >
                 Sign out

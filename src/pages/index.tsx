@@ -1,10 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { getSession } from 'next-auth/react';
-import { GetServerSideProps } from 'next';
-import { useEffect, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../lib/firebase";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 import Sidebar from '../components/layout/Sidebar';
 import Header from '../components/layout/Header';
@@ -15,8 +14,6 @@ import SmartCart from '../components/dashboard/SmartCart';
 import WarrantyTracker from '../components/dashboard/WarrantyTracker';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
-
-export const dynamic = 'force-dynamic';
 
 interface SpendingItem {
   category: string;
@@ -57,22 +54,8 @@ interface ExtractedReceiptItem {
   user_id?: string | null;
 }
 
-interface Session {
-  user: {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  };
-  expires: string;
-}
-
-interface HomePageProps {
-  session: Session;
-}
-
-const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
-  const { data: clientSession, status } = useSession();
+const HomePage = () => {
+  const [user, loading] = useAuthState(auth);
   const router = useRouter();
 
   const [spendingData] = useState<SpendingItem[]>([]);
@@ -90,22 +73,17 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
   const [walletUrl, setWalletUrl] = useState<string | null>(null);
   const [walletCreationMessage, setWalletCreationMessage] = useState('');
 
-  const session = clientSession ?? serverSession;
-
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!loading && !user) {
       router.replace("/login");
     }
-  }, [status, router]);
+  }, [user, loading, router]);
 
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-100 via-white to-indigo-200">
-        <span className="text-lg text-indigo-600 font-semibold animate-pulse">Loading...</span>
-      </div>
-    );
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
-  if (!session) return null;
+
+  if (!user) return null;
 
   const totalSpending = spendingData.reduce((sum, item) => sum + item.amount, 0);
   const totalSavings = savingsGoals.reduce((sum, goal) => sum + goal.current, 0);
@@ -147,10 +125,10 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
             body: JSON.stringify({ base64: reader.result, filename: `receipt_${Date.now()}.jpeg` }),
           });
 
-          const uploadResult: { gcsUri: string; error?: string } = await uploadRes.json();
+          const uploadResult = await uploadRes.json();
           if (!uploadRes.ok) throw new Error(uploadResult.error || 'Upload failed');
 
-          const userId = session?.user?.id || 'anonymous';
+          const userId = user.uid;
           const res = await fetch('/api/parse', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -163,7 +141,7 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
             }),
           });
 
-          const result: { text: ExtractedReceiptItem[]; error?: string } = await res.json();
+          const result = await res.json();
           if (res.ok) {
             setExtractedReceiptData(result.text);
             setReceiptUploadMessage('Receipt processed successfully!');
@@ -201,7 +179,7 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
         body: JSON.stringify({ receiptData: extractedReceiptData }),
       });
 
-      const result: { walletUrl: string; error?: string } = await response.json();
+      const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Failed to create wallet pass.');
 
       setWalletUrl(result.walletUrl);
@@ -322,16 +300,3 @@ const HomePage: React.FC<HomePageProps> = ({ session: serverSession }) => {
 };
 
 export default HomePage;
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context);
-  if (!session) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  return { props: { session } };
-};
