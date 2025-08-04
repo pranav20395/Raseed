@@ -10,6 +10,8 @@ Let's be honest, managing physical receipts is a total pain for all of us, espec
 
 You can start editing the page by modifying `src/page/index.tsx`. The page auto-updates as you edit the file.
 
+https://smart-wallet-b9b00.web.app/ 
+
 ## Tailwind CSS
 <img width="828" height="331" alt="Screenshot 2025-07-27 at 11 57 19 AM" src="https://github.com/user-attachments/assets/84e9b4d2-dd38-4d0f-9e1e-2f97d474388d" />
 
