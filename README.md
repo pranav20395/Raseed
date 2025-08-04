@@ -6,7 +6,7 @@
 
 Let's be honest, managing physical receipts is a total pain for all of us, especially if you're like many users who aren't really paying much attention to where their money goes. Your hard-earned cash just seems to vanish into thin air! You end up with crumpled receipts stuffed in pockets, leading to lost records and zero clue what you've actually spent .
 
-hosted on (https://raseed-backend--smart-wallet-b9b00.us-central1.hosted.app/) with your browser to see the result.
+
 
 You can start editing the page by modifying `src/page/index.tsx`. The page auto-updates as you edit the file.
 
